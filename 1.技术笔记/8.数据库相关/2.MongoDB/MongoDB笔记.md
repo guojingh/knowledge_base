@@ -4,7 +4,7 @@
 
 ### 1.1 什么是MongoDB?
 
-MongoDB 是面向文档的NoSQL数据库，用于大量数据存储。MongDB是一个在2000年代中期问世的数据库。属于NoSQL数据库的类别。
+MongoDB 是面向文档的NoSQL数据库，用于大量数据存储。MongoDB是一个在2000年代中期问世的数据库。属于NoSQL数据库的类别。
 
 ### 1.2 什么是NoSQL数据库？
 
