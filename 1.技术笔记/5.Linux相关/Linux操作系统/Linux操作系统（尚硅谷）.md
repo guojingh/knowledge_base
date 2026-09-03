@@ -1547,11 +1547,537 @@ userdel -r david   ----  同时删除 /home 下对应的目录
 
 1. 基本语法
 
-   1. test condition
+   1. test condition	
 
    2. [ condition ]  注意 condition 前后要有空格
 
       注意：条件非空即为true。[atguigu]返回true，[ ]返回false
+
+2. 常用条件判断
+
+   1. 两个整数之间比较
+
+      -eq 等于(equal)       		 -ne 不等于(not equal)
+      -lt 小于(less than)			-le 小于等于(less equal)
+      -gt 大于(greater than)		-ge大于等于（greater equal)
+
+      注：如果字符串之间的比较，用等号“=”判断相等；用“!=”判断不等。
+
+   2. 按照文件权限进行判断
+
+      -r有读的权限(read)
+      -w有写的权限（write）
+      -x有执行的权限（execute）
+
+   3. 按照文件类型进行判断
+
+      -e文件存在(existence)
+      -f文件存在并且是一个常规的文件（file）
+      -d文件存在井且是一个目录（directory）
+
+   4. 多条件判断（&&表示前一条命令执行成功时，才执行后一条命令， || 表示上一条命令执行失败后，才执行下一条命令）
+
+      ```shell
+      [root@hadoop100 scripts]# [ atguigu ] && echo 0k || echo notok
+      0k
+      ```
+
+
+### 6. 流程控制（重点）
+
+#### 6.1 if 判断
+
+- 基本语法
+
+  - 单分支
+
+    ```shell
+    if  [ 条件判断式 ]; then
+    fi
+    ```
+
+    或者
+
+    ```shell
+    if  [ 条件判断式 ]
+    fi
+    ```
+
+  - 多分支
+
+    ```shell
+    if [ 条件判断式 ]
+    then
+    	程序
+    elif [ 条件判断式 ]
+    then
+    	程序
+    else
+    	程序
+    fi
+    ```
+
+#### 6.2 case 语句
+
+1. 基本语法
+
+   ```shell
+   case $变量名 in
+   "值1")
+   	如果变量的值等于值1，则执行程序1
+   ;;
+   "值2")
+   	如果变量的值等于值2，则执行程序2
+   ;;
+   	...省略其他分支...
+   *) 
+   	如果变量的值都不是以上的值，则执行此程序
+   ;;
+   esac
+   ```
+
+   注意事项：
+
+   1. case行尾必须为单词“in”，每一个模式匹配必须以右括号“）”结束。
+   2. 双分号“;;”表示命今序列结束，相当于java中的break
+   3. 最后的“*）”表示默认模式，相当于java中的default
+
+#### 6.3 for 循环
+
+1. 基本语法-1
+
+   ```shell
+   for  (( 起始值; 循环条件; 变量变化 ))
+   do
+   	程序
+   done
+   ```
+
+2. 案例实操
+
+   从1依次加到输入的参数，得到总和
+
+   ```shell
+   #!/bin/bash
+   
+   for (( i=1; i<=$1; i++ ))
+   do
+           sum=$[ $sum + $i ]
+   done
+   echo $sum
+   ```
+
+3. 基本语法-2
+
+   ```shell
+   for  变量 in 值 1 值 2 值 3...
+   do
+   	程序
+   done
+   ```
+
+4. 案例实操
+
+   1. ```shell
+      # 输出1加到100的和
+      for i in {1..100}; do sum=$[$sum+$i]; done; echo $sum
+      5050
+      ```
+
+   2. 比较 $* 和 $@ 的区别
+
+      $*和$@都表示传递给函数或脚本的所有参数，不被双引号""包含时，都是以$1 $2 ... $n的形式输出所有参数。
+
+      ```shell
+      #!/bin/bash
+      
+      echo '============$*==============='
+      for para in "$*"
+      do
+              echo $para
+      done
+      
+      echo '============$@==============='
+      for para in "$@"
+      do
+              echo $para
+      done
+      
+      # 输出
+      [root@hadoop100 scripts]# ./parameter_for_test.sh a b c d e
+      ============$*===============
+      a b c d e
+      ============$@===============
+      a
+      b
+      c
+      d
+      e
+      ```
+
+#### 6.4 while 循环
+
+1. 基本语法
+
+   ```shell
+   while [ 条件判断式 ]
+   do 
+   	程序
+   done
+   ```
+
+2. 实际操作
+
+   ```shell
+   #!/bin/bash
+   
+   # while 循环从1加到输入的参数，输出总和
+   a=1
+   while [ $a -le $1 ]
+   do
+   #        sum=$[ $sum + $a ]
+   #        a=$[ $a + 1 ]
+   # 这种写法比较简单
+   	   let sum+=a
+   	   let a++
+   done
+   echo $sum
+   ```
+
+### 7. read 读取控制台输入
+
+1. 基本语法
+
+   read  (选项)  (参数)
+
+   1. 选项
+
+      -p: 指定读取值时的提示符；
+
+      -t：指定读取值时等待的时间（秒）如果 -t 不加表示一直等待
+
+   2. 参数
+
+      变量：指定读取值的变量名
+
+### 8. 函数
+
+#### 8.1 系统函数
+
+获取当前时间戳
+
+```shell
+[root@hadoop100 ~]# date +%s
+1749602118
+```
+
+##### 8.1.1 basename
+
+1. 基本语法
+
+   `basename[string/pathname`][suffix] -- 功能描述：basename 命令会删掉所有的前缀包括最后一个（“/”）字符，然后将字符串显示出来。
+
+   basename 可以理解为取路径里的文件名称
+
+   选项：
+
+   suffix为后缀，如果 suffix 被制定了，basename 会将 pathname 或 string 中的 suffix 去掉。
+
+2. 案例实操
+
+   截取文件名
+
+   ```shell
+   [root@hadoop100 scripts]# basename /root/scripts/parameter.sh 
+   parameter.sh
+   [root@hadoop100 scripts]# basename /root/scripts/parameter.sh .sh
+   parameter
+   ```
+
+##### 8.1.2 dirname
+
+1. 基本用法
+
+   dirname 文件绝对路径  --- 功能描述：从给定的包含绝对路径的文件中去除文件名（非目录部分），然后返回剩下的路径（目录部分）
+
+   dirname 可以理解为取文件路径的绝对路径名称
+
+2. 案例实操
+
+   ```shell
+   [root@hadoop100 scripts]# dirname /root/scripts/parameter.sh 
+   /root/scripts
+   ```
+
+#### 8.2 自定义函数
+
+1. 基本语法
+
+   [ function ] funname[0] 
+
+   {
+
+   ​	Action;
+
+   ​	[return int;]
+
+   }
+
+2. 经验技巧
+
+   1. 必须在调用函数地方之前，先声明函数，shell 脚本是逐行运行，不会像其它语言一样先编译。
+   2. 函数返回值，只能通过$?系统获取变量，可以显示加：return 返回，如果不加，将以最后一条命令运行结果，作为返回值。return后跟数值 n(0-255)
+
+3. 案例实操
+
+   ```shell
+   function add(){
+           s=$[$1 + $2]
+           echo $s
+   }
+   
+   read -p "请输入第一个整数:" a
+   read -p "请输入第二个整数:" b
+   
+   sum=$(add $a $b)
+   echo "和："$sum
+   ```
+
+
+### 9. 正则表达式入门
+
+​	正则表达式使用单个字符串来描述、匹配一系列符合某个语法规则的字符串。在很多文件编辑器，正则表达式通常被用来检索、替换那些符合某个模式的文本。在Linux中，grep , sed , awk 等文本处理工具都支持通过正则表达式进行模式匹配。
+
+#### 9.1 常规匹配
+
+​	一串不包含特殊字符的正则表达式匹配它自己，例如
+
+​	cat /etc/passwd | grep xiaoming
+
+​	就会匹配所有包含 xiaoming 的行
+
+#### 9.2 常用特殊字符
+
+1. 特殊字符：^
+
+   ^ 匹配一行的开头，例如：
+
+   cat /etc/passwd | grep ^a
+
+   会匹配出所有a开头的行
+
+2. 特殊字符：$
+
+   $ 匹配一行的结束，例如：
+
+   cat /etc/passwd | grep t$
+
+   会匹配出所有以t结尾的行
+
+3. 特殊字符：.
+
+   . 匹配一个任意的字符。例如：
+
+   cat /etc/passwd | grep r..t
+
+   会匹配到 rabt rbbt rxdt root 等的所有行 
+
+4. 特殊字符：*
+
+   "*" 不单独使用，它和上一个字符连用，表示匹配上一个字符0次或多次，例如
+
+   cat /etc/passwd | grep ro*t
+
+   会匹配 rt rot root rooot roooot 等所有行
+
+5. 字符区间（中扩展）：[]
+
+   [] 表示匹配某个范围内的一个字符，例如:
+
+   [6,8]  -- 匹配6或者8
+
+   [0-9] -- 匹配一个0-9的数字
+
+   [0-9]* -- 匹配任意长度的数字字符串
+
+   [a-z] -- 匹配一个 a-z 之间的字符
+
+   [a-z]* -- 匹配任意长度的字母字符串
+
+   [a-c, e-f] -- 匹配a-c或者e-f之间的任意字符
+
+6. 特殊字符：\
+
+   
+
+### 10. 文本处理工具
+
+#### 10.1 cut
+
+​	cut的工作就是“剪”，具体的说就是在文件中负责剪切数据用的。cut命令从文件的每一行剪切字节，字符和字段并将这些字节，字符和字段输出。
+
+1. 基本用法
+
+   cut [选项参数] filename
+
+   说明：默认分隔符是制表符
+
+2. 选项参数说明
+
+   ![image-20250613084603217](https://picpoahu.oss-cn-chengdu.aliyuncs.com/images/image-20250613084603217.png)
+
+3. 案例实操
+
+   1. 数据准备
+
+      ```shell
+      [root@hadoop100 scripts]# vim cut.txt
+      dong shen
+      guan zhen
+      wo wo
+      lai  lai
+      le  le
+      ```
+
+   2. 切割 cut.txt 第一列
+
+      ```shell
+      [root@hadoop100 scripts]# cut -d " " -f 1 cut.txt 
+      dong
+      guan
+      wo
+      lai
+      le
+      ```
+
+   3. 切割 cut.txt 第二列，第三列
+
+      ```shell
+      [root@hadoop100 scripts]# cut -d " " -f 2,3 cut.txt 
+      shen
+      zhen
+      wo
+       lai
+       le
+      ```
+
+   4. 在 cut.txt 文件中切割出 guan
+
+      ```shell
+      [root@hadoop100 scripts]# cat cut.txt  |grep guan | cut -d " " -f 1
+      guan
+      
+      ```
+
+   5. 选出系统 PATH 变量值，第2个 “:” 开始后的所有路径
+
+      ```shell
+      [root@hadoop100 scripts]# echo $PATH | cut -d ":" -f 3-
+      /usr/sbin:/usr/bin:/root/bin
+      ```
+
+   6. 切割 ifconfig 后打印的 IP 地址
+
+      ```
+      [root@hadoop100 scripts]# ifconfig ens33 | grep netmask | cut -d " " -f 10
+      172.16.56.140
+      [root@hadoop100 scripts]# ifconfig | grep netmask | cut -d " " -f 10
+      172.16.56.140
+      127.0.0.1
+      192.168.122.1
+      ```
+
+#### 10.2 awk
+
+​	一个强大的文本分析工具，把文件逐行读入，以空格为默认分分隔符将每行切开，切开的部分再进行分析处理。
+
+1. 基本用法
+
+   awk [选项参数] '/pattern1/{action}  /pattern2/{action2}...'  filename
+
+   pattern: 表示 awk 在数据中查找的内容，就是匹配模式
+
+   action: 在找到匹配内容时所执行的一系列命令
+
+2. 选项参数说明
+
+   ![image-20250613090454747](https://picpoahu.oss-cn-chengdu.aliyuncs.com/images/image-20250613090454747.png)
+
+
+
+### 11. 综合应用案例 
+
+#### 11.1 归档文件
+
+​	实际生产应用中，往往需要对重要数据进行归档备份。
+
+​	需求：实现一个每天对指定目录规定备份的脚本，输入一个目录名称（末尾不带/），将目录下所有文件按天归档保存，并将归档日期附加在归档文件上，放在/root/archive下。
+
+​	这里用到了归档命令： tar
+
+​	后面可以加上 -c 选项表示归档，加上 -z 选项表示同时进行压缩，得到的文件后缀名为 .tar.gz
+
+​	脚本实现：
+
+```shell
+#!/bin/bash
+
+# 首先判断输入参数个数是否为1
+if [ $# -ne 1 ]
+then
+        echo "参数个数错误！应该输入一个参数，作为归档目录名"
+        exit
+fi
+
+# 从参数中获取目录名称
+if [ -d $1 ]
+then
+        echo
+else
+        echo
+        echo "目录不存在！"
+        echo
+        exit
+fi
+
+# 
+DIR_NAME=$(basename $1)
+DIR_PATH=$(cd $(dirname $1); pwd)
+
+# 获取当前日期
+DATE=$(date +%y%m%d)
+
+# 定义生成的归档名称
+FILE=archive_${DIR_NAME}_$DATE.tar.gz
+DEST=/root/archive/$FILE
+
+# 开始归档目录文件
+echo "开始归档"
+echo
+
+tar -czf $DEST $DIR_PATH/$DIR_NAME
+
+if [ $? -eq 0 ]
+then
+        echo
+        echo "归档成功"
+        echo "归档文件为：$DEST"
+else
+        echo "归档出险问题"
+        echo
+fi
+
+exit
+```
+
+​	将上面脚本加入定时任务工具中，每日凌晨2点执行脚本
+
+```shell
+[root@hadoop100 archive]# crontab -e
+0 2 * * *  /root/scripts/daily_archive.sh /root/scripts
+```
+
+
 
  
 
