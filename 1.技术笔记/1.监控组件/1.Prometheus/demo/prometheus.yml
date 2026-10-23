@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s          # 本地演示调短，默认 15s 出图太慢
+
+scrape_configs:
+  - job_name: avatar-pkg        # 抓我们自己的 demo 应用
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["app:8100"]   # docker-compose 网络里用服务名访问
