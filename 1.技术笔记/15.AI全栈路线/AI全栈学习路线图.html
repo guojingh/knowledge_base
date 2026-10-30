@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 全栈学习路线图</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #111; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    header { text-align: center; padding: 48px 16px 8px; }
+    header h1 { font-size: 40px; margin: 0 0 10px; }
+    header p { margin: 0; color: #555; }
+    .legend { display: flex; justify-content: center; gap: 20px; margin-top: 18px; font-size: 13px; color: #444; flex-wrap: wrap; }
+    .legend span::before { content: ""; display: inline-block; width: 14px; height: 14px; border: 2px solid #111; border-radius: 3px; margin-right: 6px; vertical-align: -3px; }
+    .legend .l-stage::before { background: #fdff00; }
+    .legend .l-item::before { background: #ffe599; }
+    .legend .l-project::before { background: #c9f0c0; }
+    .legend .l-current::before { background: #ffe599; border-color: #2563eb; }
+    #map { position: relative; max-width: 1240px; margin: 0 auto; padding: 40px 16px 100px; }
+    #lines { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+    .stage { display: grid; grid-template-columns: 1fr 250px 1fr; gap: 64px; align-items: center; margin-bottom: 90px; }
+    .side { display: flex; flex-direction: column; gap: 22px; }
+    .side.left { align-items: flex-end; }
+    .side.right { align-items: flex-start; }
+    .group { width: 100%; max-width: 330px; border: 2px dashed #9ca3af; border-radius: 8px; padding: 10px 12px 12px; background: #fff; position: relative; z-index: 1; }
+    .group h3 { margin: 0 0 4px; font-size: 13px; color: #6b7280; font-weight: 600; }
+    .item { background: #ffe599; border: 2px solid #111; border-radius: 5px; padding: 7px 10px; margin-top: 7px; font-size: 14px; cursor: pointer; transition: transform .1s, background .1s; }
+    .item:hover { background: #ffd54f; transform: translateX(2px); }
+    .group.project .item { background: #c9f0c0; }
+    .group.project .item:hover { background: #a7e39a; }
+    .item.current { border-color: #2563eb; box-shadow: 0 0 0 3px #bfdbfe; }
+    .item .tag { float: right; font-size: 12px; color: #fff; background: #2563eb; border-radius: 10px; padding: 1px 8px; }
+    .node { position: relative; z-index: 1; background: #fdff00; border: 2px solid #111; border-radius: 6px; padding: 16px 12px; text-align: center; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0 #111; }
+    .node small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: #444; }
+    .node.ai { box-shadow: 4px 4px 0 #e11d48; border-color: #e11d48; }
+    .node.ai::after { content: "重点"; position: absolute; top: -12px; right: -12px; background: #e11d48; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+    .drawer { position: fixed; top: 0; right: 0; width: 380px; max-width: 90vw; height: 100%; background: #fff; border-left: 2px solid #111; padding: 28px; transform: translateX(105%); transition: transform .25s; z-index: 10; overflow-y: auto; }
+    .drawer.open { transform: none; }
+    .drawer .path { font-size: 13px; color: #6b7280; }
+    .drawer h2 { margin: 8px 0 16px; }
+    .drawer p { line-height: 1.8; }
+    .drawer button { position: absolute; top: 16px; right: 16px; border: 2px solid #111; background: #fff; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    @media (max-width: 900px) {
+      .stage { grid-template-columns: 1fr; gap: 16px; }
+      .node { order: -1; }
+      .side.left, .side.right { align-items: stretch; }
+      .group { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI 全栈学习路线图</h1>
+    <p>从前端出发，经过后端与部署，最终能独立交付 AI 应用。点击任意节点查看说明。</p>
+    <div class="legend">
+      <span class="l-stage">主干阶段</span>
+      <span class="l-item">技术节点</span>
+      <span class="l-project">练手项目</span>
+      <span class="l-current">当前位置</span>
+    </div>
+  </header>
+
+  <div id="map"><svg id="lines"></svg></div>
+
+  <aside class="drawer" id="drawer">
+    <button id="close">✕</button>
+    <div class="path" id="d-path"></div>
+    <h2 id="d-title"></h2>
+    <p id="d-desc"></p>
+  </aside>
+
+  <script>
+    // 每个阶段：title 主干节点；left/right 两侧分支；分支内 items 为 [名称, 说明]
+    const roadmap = [
+      {
+        title: '阶段 1 · Web 基础', sub: 'HTML / CSS / JS / 浏览器',
+        desc: '一切前端开发的地基。AI 生成的页面出了问题，要靠这一层的知识排查。',
+        left: [
+          { name: 'HTML / CSS', items: [
+            ['语义化与表单', 'header、nav、article 等标签表达结构，表单与原生校验。'],
+            ['布局', '盒模型、定位、Flex、Grid、响应式。'],
+            ['Tailwind CSS', '原子化类名方案，AI 生成 UI 时最常用。']] },
+          { name: '工具', items: [
+            ['Git', '分支、合并、解决冲突、提交规范。'],
+            ['Chrome DevTools', '元素调试、断点、网络面板、性能分析。']] }
+        ],
+        right: [
+          { name: 'JavaScript', items: [
+            ['语言核心', '作用域与闭包、this、原型链。'],
+            ['异步与事件循环', 'Promise、async/await，微任务和宏任务的执行顺序。'],
+            ['ES6+ 与模块化', '解构、箭头函数、类、import/export。']] },
+          { name: '浏览器与网络', items: [
+            ['DOM 与渲染', '事件冒泡与委托，重排与重绘。'],
+            ['HTTP 与跨域', '状态码、缓存、HTTPS、CORS。'],
+            ['身份凭证', 'Cookie、Session、Token 的区别。']] },
+          { name: '练手项目', project: true, items: [
+            ['原生 JS Todo / 天气页', '不用框架，手写一个 Todo 应用或调用公开 API 的天气查询页。']] }
+        ]
+      },
+      {
+        title: '阶段 2 · 前端框架与工程化', sub: 'Vue / React / TypeScript',
+        desc: 'Vue 和 React 都要掌握。Vue 在国内业务中常见，React 生态更大，AI 生成 UI 的工具大多基于 React。',
+        left: [
+          { name: 'Vue', items: [
+            ['Vue 2 基础', '指令、计算属性、侦听器、事件处理、生命周期、组件通信。你现在就在这里。', true],
+            ['Vue 3 Composition API', 'setup、ref、reactive、<script setup>，响应式基于 Proxy。'],
+            ['Pinia / Vue Router', '状态管理与路由，导航守卫做权限控制。'],
+            ['Element Plus', '快速搭建后台管理界面。']] },
+          { name: 'TypeScript', items: [
+            ['类型、接口、泛型', '给数据加约束，编写可复用的类型。'],
+            ['类型收窄', '让编译器帮你发现错误，审查 AI 生成的代码时非常有用。']] },
+          { name: '工程化', items: [
+            ['pnpm / Vite', '包管理与开发构建工具。'],
+            ['ESLint + Prettier', '代码规范检查与自动格式化。']] }
+        ],
+        right: [
+          { name: 'React 核心', items: [
+            ['JSX 与组件', '函数组件、props、条件与列表渲染。'],
+            ['Hooks', 'useState、useEffect、useRef、useMemo、useCallback，以及自定义 Hook。'],
+            ['渲染机制', '状态更新触发重新渲染，理解闭包陷阱和不必要的渲染。']] },
+          { name: 'React 生态', items: [
+            ['React Router', '客户端路由、嵌套路由、数据加载。'],
+            ['Zustand / Redux Toolkit', '全局状态管理。Zustand 轻量，Redux Toolkit 适合大型项目。'],
+            ['TanStack Query', '服务端数据请求、缓存、重试与同步。'],
+            ['React Hook Form + Zod', '表单处理与数据校验。'],
+            ['shadcn/ui', '基于 Tailwind 的组件方案，AI 生成 UI 最常用的组件库。'],
+            ['Next.js', 'React 官方推荐的全栈框架：App Router、服务端组件、SSR、Server Actions。']] },
+          { name: '练手项目', project: true, items: [
+            ['后台管理系统', 'Vue 3 + TS + Pinia，包含登录、列表、表单和权限路由。'],
+            ['Next.js 应用', 'Next.js + shadcn/ui + TanStack Query，做一个数据看板。']] }
+        ]
+      },
+      {
+        title: '阶段 3 · 后端与数据库', sub: 'Node.js / Go / Python / SQL',
+        desc: '从前端走向全栈。先用 Node.js 起步，再学 Go 和 Python：Go 用于高并发服务，Python 是 AI 生态的主力语言。',
+        left: [
+          { name: 'Node.js（起步）', items: [
+            ['Node 基础', '模块系统、文件操作、流、事件驱动模型。'],
+            ['NestJS', '分层清晰、依赖注入，适合中大型后端项目。']] },
+          { name: 'Go（高并发服务）', items: [
+            ['语法核心', '结构体、接口、错误处理、包管理（Go Modules）。'],
+            ['并发模型', 'goroutine、channel、context，Go 最核心的能力。'],
+            ['Gin / Echo', '常用 Web 框架，编写 HTTP 接口。'],
+            ['GORM', 'Go 的 ORM 库。'],
+            ['gRPC + Protobuf', '服务之间的高性能远程调用，微服务常用。']] },
+          { name: 'Python（AI 生态）', items: [
+            ['语法核心', '数据结构、推导式、装饰器、类型注解。'],
+            ['asyncio', '异步编程，处理大模型的流式调用和并发请求。'],
+            ['FastAPI + Pydantic', '高性能接口框架，自带数据校验和接口文档，AI 服务的首选。'],
+            ['数据处理', 'Pandas、NumPy 基础，做 RAG 数据清洗时会用到。']] }
+        ],
+        right: [
+          { name: '数据库', items: [
+            ['MySQL / PostgreSQL', 'SQL 语句、索引、事务、表结构设计。'],
+            ['ORM', 'Node 用 Prisma，Go 用 GORM，Python 用 SQLAlchemy。'],
+            ['Redis', '缓存、会话存储、排行榜、限流。']] },
+          { name: 'API 设计', items: [
+            ['RESTful', '以资源为中心的接口规范。'],
+            ['JWT / OAuth', '登录鉴权与第三方登录。'],
+            ['校验与错误处理', '参数校验、统一返回格式、全局异常处理。']] },
+          { name: 'Web 安全', items: [
+            ['XSS / CSRF / SQL 注入', '常见攻击方式与防御手段。AI 生成的代码经常在这里出问题。'],
+            ['密钥管理', '密钥放在环境变量或密钥服务里，不要写进代码。']] },
+          { name: '练手项目', project: true, items: [
+            ['带登录的博客', 'Next.js 前端 + Go（Gin）后端 + PostgreSQL，实现注册登录、文章增删改查。'],
+            ['FastAPI 服务', '用 FastAPI 为博客写一个文章摘要接口，为阶段 5 做准备。']] }
+        ]
+      },
+      {
+        title: '阶段 4 · 部署与云原生', sub: 'Docker / Kubernetes / CI/CD',
+        desc: '让项目真正上线：先用 Docker 打包，再用 Kubernetes 编排多个服务，配合 CI/CD 和监控做到自动发布、可观测。',
+        left: [
+          { name: '服务器', items: [
+            ['Linux', '常用命令、文件权限、进程管理、Shell 脚本。'],
+            ['Nginx', '静态资源托管、反向代理、HTTPS 配置。']] },
+          { name: '容器', items: [
+            ['Docker', '编写 Dockerfile、多阶段构建，把应用打包成镜像。'],
+            ['docker-compose', '本地一条命令同时启动前端、后端和数据库。'],
+            ['镜像仓库', 'Docker Hub、Harbor 或云厂商镜像仓库。']] },
+          { name: 'CI/CD', items: [
+            ['GitHub Actions', '提交代码后自动测试、构建镜像、部署。'],
+            ['GitOps / Argo CD', '以 Git 仓库为准，自动把配置同步到 K8s 集群。']] }
+        ],
+        right: [
+          { name: 'Kubernetes', items: [
+            ['核心对象', 'Pod、Deployment、Service，理解应用如何运行和互相访问。'],
+            ['Ingress', '对外暴露服务，按域名和路径转发流量。'],
+            ['ConfigMap / Secret', '配置与密钥和镜像分离。'],
+            ['存储', 'PV、PVC，给数据库等有状态服务挂载持久化存储。'],
+            ['弹性伸缩 HPA', '按 CPU 或请求量自动扩缩容。'],
+            ['Helm', 'K8s 应用的包管理，用模板管理多环境部署。'],
+            ['本地练习', '用 kind、minikube 或 k3s 在本机搭集群。']] },
+          { name: '可观测性', items: [
+            ['Prometheus + Grafana', '指标采集与监控大盘。'],
+            ['日志', 'Loki 或 ELK 集中收集日志。'],
+            ['Sentry', '前后端错误上报与追踪。']] },
+          { name: '练手项目', project: true, items: [
+            ['博客上 K8s', '前端、Go 后端、FastAPI 服务分别打成镜像，用 Helm 部署到集群，配置 Ingress、HPA 和监控。']] }
+        ]
+      },
+      {
+        title: '阶段 5 · AI 应用开发', sub: '大模型 / RAG / Agent', ai: true,
+        desc: '前端 + 全栈 + AI 是目前很有竞争力的组合，这一阶段最能拉开差距。',
+        left: [
+          { name: '大模型调用', items: [
+            ['模型 API', 'OpenAI、Claude、文心、通义、DeepSeek 等接口的调用方式。'],
+            ['核心参数', 'token、上下文窗口、temperature 的含义与计费方式。'],
+            ['Ollama', '在本机运行开源模型，方便调试。']] },
+          { name: '流式交互', items: [
+            ['SSE 流式输出', '服务端逐字推送，实现打字机效果。'],
+            ['Markdown 渲染', '渲染模型回答中的 Markdown 和代码高亮。'],
+            ['交互体验', '中断生成、出错重试、多轮会话管理，这是前端的强项。']] },
+          { name: 'Prompt 工程', items: [
+            ['结构化提示词', '按角色、任务、约束、输出格式组织提示词。'],
+            ['少样本示例', '给模型看几个例子，让输出更稳定。'],
+            ['结构化输出', '让模型按 JSON Schema 返回数据。']] }
+        ],
+        right: [
+          { name: 'RAG 检索增强', items: [
+            ['文本切分', '把长文档拆成适合检索的片段。'],
+            ['Embedding', '把文本转换成向量，用于语义检索。'],
+            ['向量数据库', 'pgvector、Milvus 等，存储和检索向量。'],
+            ['检索与重排', '找出最相关的片段交给模型回答。']] },
+          { name: 'Agent', items: [
+            ['Function Calling', '让模型决定调用你写好的函数。'],
+            ['MCP', '模型连接外部工具和数据源的标准协议。'],
+            ['任务编排', '多步规划、执行与结果校验。']] },
+          { name: '开发框架', items: [
+            ['Vercel AI SDK', 'TypeScript 端首选，和 Next.js 配合做流式对话开箱即用。'],
+            ['LangChain / LangGraph', 'Python 端主流的 RAG 与 Agent 编排框架，LangGraph 用来编排多步 Agent。'],
+            ['LlamaIndex', '专注文档索引与检索，搭 RAG 很快。']] },
+          { name: '练手项目', project: true, items: [
+            ['个人知识库问答', 'Next.js 前端 + FastAPI 后端，上传文档后基于 RAG 回答，支持流式输出和对话历史，部署到 K8s。']] }
+        ]
+      },
+      {
+        title: '阶段 6 · 生产级 AI 系统', sub: '扛得住 · 评得出 · 管得住',
+        desc: '前 5 个阶段解决"做得出来"，这一阶段解决"上线后能用好"：用户多了系统扛得住，AI 回答质量能衡量，成本和风险可控。所有内容都围绕把阶段 5 的 AI 应用变成生产级系统。',
+        left: [
+          { name: '扛得住：系统设计', items: [
+            ['高并发与缓存', '缓存策略、缓存击穿与雪崩、限流降级。'],
+            ['消息队列', 'Kafka、RabbitMQ，把文档解析、向量化等耗时任务异步化。'],
+            ['微服务拆分', '按业务边界拆服务，服务之间用 gRPC 通信。'],
+            ['性能优化', '前端看 Core Web Vitals，后端做压测和慢查询分析。']] },
+          { name: '管得住：成本与安全', items: [
+            ['成本与延迟', '语义缓存、模型路由（简单问题用小模型）、控制 token 用量。'],
+            ['AI 安全', 'Prompt 注入防御、输出内容审核、敏感数据脱敏、权限隔离。']] }
+        ],
+        right: [
+          { name: '评得出：AI 质量', items: [
+            ['评估体系 Evals', '建测试集，量化回答准确率和 RAG 召回率，改 Prompt 或模型前后有数据对比。'],
+            ['链路追踪', 'Langfuse、LangSmith 记录每次调用的输入、输出、耗时和花费。'],
+            ['模型微调', 'LoRA 微调与私有化部署（vLLM），通用模型效果不够时再考虑。']] },
+          { name: '质量保障', items: [
+            ['自动化测试', 'Vitest、Go test、pytest 写单元测试，Playwright 写端到端测试。'],
+            ['灰度发布', '在 K8s 上做金丝雀发布，新版本先给少量用户。']] },
+          { name: '练手项目', project: true, items: [
+            ['知识库问答升级', '给阶段 5 的项目加上评估集、Langfuse 追踪、异步文档处理队列、语义缓存和灰度发布。']] }
+        ]
+      }
+    ];
+    const map = document.getElementById('map');
+    const svg = document.getElementById('lines');
+    const nodes = [];
+    const links = [];
+
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+
+    function openDrawer(path, title, desc) {
+      document.getElementById('d-path').textContent = path;
+      document.getElementById('d-title').textContent = title;
+      document.getElementById('d-desc').textContent = desc;
+      document.getElementById('drawer').classList.add('open');
+    }
+    document.getElementById('close').onclick = () => document.getElementById('drawer').classList.remove('open');
+
+    function renderSide(stage, groups, side) {
+      const box = el('div', 'side ' + side);
+      groups.forEach(g => {
+        const group = el('div', 'group' + (g.project ? ' project' : ''));
+        group.appendChild(el('h3', '', g.name));
+        g.items.forEach(([name, desc, current]) => {
+          const item = el('div', 'item' + (current ? ' current' : ''), name);
+          if (current) item.appendChild(el('span', 'tag', '当前'));
+          item.onclick = () => openDrawer(stage.title + ' / ' + g.name, name, desc);
+          group.appendChild(item);
+        });
+        box.appendChild(group);
+        links.push({ group, side, index: nodes.length });
+      });
+      return box;
+    }
+
+    roadmap.forEach(stage => {
+      const row = el('section', 'stage');
+      const node = el('div', 'node' + (stage.ai ? ' ai' : ''), stage.title);
+      node.appendChild(el('small', '', stage.sub));
+      node.onclick = () => openDrawer('主干', stage.title, stage.desc);
+      row.appendChild(renderSide(stage, stage.left, 'left'));
+      row.appendChild(node);
+      row.appendChild(renderSide(stage, stage.right, 'right'));
+      nodes.push(node);
+      map.appendChild(row);
+    });
+
+    function rect(e) {
+      const r = e.getBoundingClientRect(), m = map.getBoundingClientRect();
+      return { l: r.left - m.left, r: r.right - m.left, t: r.top - m.top, b: r.bottom - m.top, cx: (r.left + r.right) / 2 - m.left, cy: (r.top + r.bottom) / 2 - m.top };
+    }
+
+    function path(d, color, width, dash) {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', d);
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', color);
+      p.setAttribute('stroke-width', width);
+      if (dash) p.setAttribute('stroke-dasharray', dash);
+      svg.appendChild(p);
+    }
+
+    function drawLines() {
+      svg.innerHTML = '';
+      svg.setAttribute('width', map.scrollWidth);
+      svg.setAttribute('height', map.scrollHeight);
+      if (window.innerWidth <= 900) return;
+      // 主干：相邻阶段之间的实线
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const a = rect(nodes[i]), b = rect(nodes[i + 1]);
+        path(`M${a.cx},${a.b} L${b.cx},${b.t}`, '#2563eb', 4);
+      }
+      // 分支：阶段节点到每个分组的虚线曲线
+      links.forEach(({ group, side, index }) => {
+        const n = rect(nodes[index]), g = rect(group);
+        const x1 = side === 'left' ? n.l : n.r;
+        const x2 = side === 'left' ? g.r : g.l;
+        const mid = (x1 + x2) / 2;
+        path(`M${x1},${n.cy} C${mid},${n.cy} ${mid},${g.cy} ${x2},${g.cy}`, '#2563eb', 2, '6 5');
+      });
+    }
+
+    window.addEventListener('load', drawLines);
+    window.addEventListener('resize', drawLines);
+  </script>
+</body>
+</html>
