@@ -153,3 +153,51 @@ func minSubArrayLen(target int, nums []int) int {
     return result
 }
 ```
+
+### 59.螺旋矩阵II
+```
+给定一个正整数 n，生成一个包含 1 到 n^2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
+
+示例:
+
+输入: 3 输出: [ [ 1, 2, 3 ], [ 8, 9, 4 ], [ 7, 6, 5 ] ]
+```
+
+```go
+func generateMatrix(n int) [][]int {
+    
+    startX, startY := 0, 0
+    i, j := 0, 0
+    offset := 1 
+    num := 1
+    numbers := make([][]int, n)
+    for i := range numbers {
+        numbers[i] = make([]int, n)
+    }
+    for l := 0; l < n/2; l++ {
+        for j = startY; j < n-offset; j++ {
+            numbers[startX][j] = num
+            num++
+        }
+        for i = startX; i < n-offset; i++ {
+            numbers[i][j] = num
+            num++
+        }
+        for ; j > offset-1; j-- {
+            numbers[i][j] = num
+            num++
+        }
+        for ; i > offset-1; i-- {
+            numbers[i][j] = num
+            num++
+        }
+        offset++
+        startX++
+        startY++
+    }
+    if n % 2 != 0 {
+        numbers[n/2][n/2] = n * n
+    }
+    return numbers
+}
+```
