@@ -356,3 +356,32 @@ func (this *MyLinkedList) DeleteAtIndex(index int)  {
  * obj.DeleteAtIndex(index);
  */
 ```
+
+```
+题意：反转一个单链表。
+
+示例: 输入: 1->2->3->4->5->NULL 输出: 5->4->3->2->1->NULL
+```
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func reverseList(head *ListNode) *ListNode {
+    // 使用双指针法
+    cur := head
+    var pre *ListNode
+    var tmp *ListNode
+    for cur != nil {
+        tmp = cur.Next
+        cur.Next = pre
+        pre = cur
+        cur = tmp
+    }
+
+    return pre
+}
+```
