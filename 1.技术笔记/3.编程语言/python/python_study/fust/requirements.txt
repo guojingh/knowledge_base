@@ -1,0 +1,2 @@
+# fastapi[standard]>=0.141：较新版本 + 开箱即用的完整工具链（含 uvicorn 和 CLI）
+fastapi[standard]>=0.141

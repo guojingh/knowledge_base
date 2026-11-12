@@ -1,0 +1,48 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8100:8100"          # 本机可直接访问 http://localhost:8100/metrics
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"          # Prometheus 自带 Web UI，现场敲 PromQL 就在这
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"          # 可选：做看板用
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true      # 本地免登录
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # 造流量：不停地打各个接口，让 rate()/P95/错误率 立刻有数据。
+  # 演示时可以 `docker compose stop loadgen` 停掉，观察曲线掉下来。
+  loadgen:
+    image: curlimages/curl:latest
+    depends_on:
+      - app
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        sleep 5
+        while true; do
+          curl -s http://app:8100/hello        > /dev/null
+          curl -s http://app:8100/slow         > /dev/null
+          curl -s http://app:8100/flaky        > /dev/null
+          curl -s "http://app:8100/task/train?path=unet" > /dev/null
+          curl -s "http://app:8100/task/train?path=vis"  > /dev/null
+          sleep 1
+        done
+    restart: unless-stopped
