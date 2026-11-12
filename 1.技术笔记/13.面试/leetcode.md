@@ -459,3 +459,35 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
     return l1
 }
 ```
+
+### 142. 环形链表 II
+[题目链接](https://leetcode.cn/problems/linked-list-cycle-ii/description/ "题目链接")
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func detectCycle(head *ListNode) *ListNode {
+    
+    // 使用快慢指针实现
+    fast := head
+    slow := head
+    for fast != nil && fast.Next != nil && fast.Next.Next != nil{
+        fast = fast.Next.Next
+        slow = slow.Next
+        if fast == slow {
+            index1 := fast
+            index2 := head
+            for index1 != index2 {
+                index1 = index1.Next
+                index2 = index2.Next
+            }
+            return index1
+        }
+    }
+    return nil
+}
+```
