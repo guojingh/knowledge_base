@@ -491,3 +491,37 @@ func detectCycle(head *ListNode) *ListNode {
     return nil
 }
 ```
+
+## 哈希表
+### 242.有效的字母异位词
+```
+给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的字母异位词。
+
+示例 1: 输入: s = "anagram", t = "nagaram" 输出: true
+
+示例 2: 输入: s = "rat", t = "car" 输出: false
+
+说明: 你可以假设字符串只包含小写字母
+```
+
+```go
+func isAnagram(s string, t string) bool {
+    
+    // 使用 哈希表 解决
+    m := make(map[rune]int, 26)
+
+    for _, i := range s {
+        m[i] = m[i]+1
+    }
+    for _, i := range t {
+        m[i] = m[i]-1
+    }
+    for _, v := range m {
+        if v != 0 {
+            return false
+        } 
+    }
+
+    return true
+}
+```
