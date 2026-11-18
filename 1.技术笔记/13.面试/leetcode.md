@@ -525,3 +525,31 @@ func isAnagram(s string, t string) bool {
     return true
 }
 ```
+
+### 349. 两个数组的交集
+[题目链接](https://leetcode.cn/problems/intersection-of-two-arrays/description/ "题目链接")
+
+```go
+package main
+
+func intersection(nums1 []int, nums2 []int) []int {
+    result := make([]int, 0)
+    res := make(map[int]struct{})
+    set := make(map[int]struct{})
+
+    for _, i := range nums1 {
+        set[i] = struct{}{}
+    }
+
+    for _, j := range nums2 {
+        if _, ok := set[j]; ok {
+            res[j] = struct{}{}
+        }
+    }
+
+    for i, _ := range res {
+        result = append(result, i)
+    }
+    return result
+}
+```
