@@ -150,3 +150,95 @@ WebSocket 使得客户端和服务器之间的数据交换变得更加简单，�
 
 由上图可知，目前主流的Web浏览器都支持WebSocket，所以目前基本上我们都所有项目里面都是可以使用WebSocket的。
 
+使用 WebSocket  构造函数，我们就可以轻易地构造一个 WebSocket 对象。
+
+**下面会从四个方面介绍 WebSocket API：**
+
+1. WebSocket 的构造函数
+2. WebSocket 对象的属性
+3. WebSocket 的方法
+4. WebSocket 的事件
+
+### 2.2 构造函数
+
+WebSocket 的构造函数为：
+
+```ts
+const myWebSocket = new WebSocket(url: string | URL, protocols?: string | string[]): WebSocket;
+```
+
+相关参数：
+
+- URL：表示连接的URL，这是 WebSocket 服务器响应的 URL;
+- protocols（可选）：一个协议字符串或者一个包含协议字符串的数组
+
+**针对protocols**：这个字符串用于指定子协议，这样单个服务器可以实现多个 WebSocket 子协议。如果不指定协议字符串，则假定为空字符串。
+
+### 2.3 属性
+
+WebSocket 对象包含一下属性：
+
+![image-20261119111626361](https://picpoahu.oss-cn-chengdu.aliyuncs.com/images/image-20261119111626361.png)
+
+**各属性具体含义：**
+
+- binaryType：使用二进制的数据类型连接；
+- bufferedAmount（只读）：未发送至服务器的字节数；
+- extensions（只读）：服务器选择的扩展；
+- onclose：用于指定连接关闭后的回调函数；
+- onerror：用于指定连接失败后的回调函数；
+- onmessage：用于指定当从服务器接受到信息时的回调函数；
+- onopen：用于指定连接成功后的回调函数；
+- protocol（只读）：用于返回服务器端选中的子协议的名字；
+- readyState（只读）：返回当前 WebSocket 的连接状态，共有 4 种状态：
+  - \- *CONNECTING — 正在连接中，对应的值为 0；*
+  -   \- *OPEN — 已经连接并且可以通讯，对应的值为 1；*
+  -   \- *CLOSING — 连接正在关闭，对应的值为 2；*
+  -   \- *CLOSED — 连接已关闭或者没有连接成功，对应的值为 3*
+- url（只读）：返回值为当构造函数创建 WebSocket 实例对象时 URL 的绝对路径。
+
+### 2.4 方法
+
+**WebSocket 主要有两个方法：**
+
+```ts
+// 该方法将需要通过 WebSocket 链接传输至服务器的数据排入队列，并根据所需要传输的数据的大小来增加 bufferedAmount 的值 。若数据无法传输（比如数据需要缓存而缓冲区已满）时，套接字会自行关闭。
+send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
+
+// 该方法用于关闭 WebSocket 连接，如果连接已经关闭，则此方法不执行任何操作；
+close(code?: number, reason?: string): void;
+```
+
+### 2.5 事件
+
+使用 addEventListener()  来监听下面事件。
+
+**以下是几个事件：**
+
+- close：当一个 WebSocket 连接被关闭时触发，也可以通过 onclose 属性来设置；
+- error：当一个 WebSocket 连接因错误而关闭时触发，也可以通过 onerror 属性来设置；
+- message：当通过 WebSocket 收到数据时触发，也可以通过 onmessage 属性来设置；
+- open：当一个 WebSocket 连接成功时触发，也可以通过 onopen 属性来设置
+
+## 3. WebSocket 服务器
+
+### 3.1 生命周期
+
+![image-20261119154045094](https://picpoahu.oss-cn-chengdu.aliyuncs.com/images/image-20261119154045094.png)
+
+从上图可知，在使用 WebSocket 实现双全工通信之前，客户端与服务端之前需要进行握手（Handshake），在握手完成之后才能开始进行数据的双向通信。
+
+**握手是在通信电路创建之后，信息传输开始之前。**
+
+**握手用于达成参数，如：**
+
+1. 信息传输率
+2. 字母表
+3. 奇偶校验
+4. 中断过程
+5. 其他协议特性
+
+握手有助于不同结构的系统或设备在通信信道中连接，而不需要人为设置参数。
+
+**分析WebSocket的握手协议**
+

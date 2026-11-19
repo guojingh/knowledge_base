@@ -112,6 +112,12 @@ function handleFrame(socket, { opcode, payload }) {
       socket.write(buildFrame(0x1, Buffer.from(text)));
       break;
     }
+    case 0x2: {
+      // 二进制帧：原样回传
+      console.log("收到二进制数据，字节数：", payload.length);
+      socket.write(buildFrame(0x2, payload));
+      break;
+    }
     case 0x8:
       // 关闭帧：回一个关闭帧后断开
       socket.end(buildFrame(0x8, payload));
