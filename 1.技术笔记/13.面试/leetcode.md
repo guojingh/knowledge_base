@@ -576,3 +576,24 @@ func getSum(n int) int {
     return sum
 }
 ```
+
+### 1. 两数之和
+[题目链接](https://leetcode.cn/problems/two-sum/description/ "题目链接")
+
+```go
+func twoSum(nums []int, target int) []int {
+
+    // 对于这种需要检验元素是否出现过，可以第一时间想到哈希集合
+    var res []int
+    set := make(map[int]int)
+    for i := 0; i < len(nums); i++ {
+        j := target - nums[i]
+        if _, ok := set[j]; !ok {
+            set[nums[i]] = i
+        } else {
+            res = append(res, i, set[j])
+        }
+    }
+    return res
+}
+```
