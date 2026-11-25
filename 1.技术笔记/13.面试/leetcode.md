@@ -597,3 +597,38 @@ func twoSum(nums []int, target int) []int {
     return res
 }
 ```
+
+### 454. 四数相加II
+[题目链接](https://leetcode.cn/problems/4sum-ii/description/ "题目链接")
+
+```go
+func fourSumCount(nums1 []int, nums2 []int, nums3 []int, nums4 []int) int {
+
+    var count int
+    
+    // 使用map解决
+    set := make(map[int]int)
+    for i := 0; i < len(nums1); i++ {
+        for j := 0; j < len(nums2); j ++ {
+            ab := nums1[i] + nums2[j]
+            if _, ok := set[ab]; !ok {
+                set[ab] = 1
+            } else {
+                set[ab] = set[ab] + 1
+            }
+        }
+    }
+
+    // 遍历cd数组
+    for i := 0; i < len(nums3); i++ {
+        for j := 0; j < len(nums4); j++ {
+            need := 0 - nums3[i] - nums4[j]
+            if _, ok := set[need]; ok {
+                count = count + set[need]
+            }
+        }
+    }
+
+    return count
+}
+```
