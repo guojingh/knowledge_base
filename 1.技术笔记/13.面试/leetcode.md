@@ -632,3 +632,36 @@ func fourSumCount(nums1 []int, nums2 []int, nums3 []int, nums4 []int) int {
     return count
 }
 ```
+
+### 383. 赎金信
+[题目链接](https://leetcode.cn/problems/ransom-note/description/ "题目链接")
+
+```go
+func canConstruct(ransomNote string, magazine string) bool {
+
+    // 使用 map 解决
+    sMap := make(map[byte]int)
+
+    for i := 0; i < len(magazine); i++ {
+        if _, ok := sMap[magazine[i]]; !ok {
+            sMap[magazine[i]] = 1
+        } else {
+            sMap[magazine[i]]++
+        }
+    }
+
+    for i := 0; i < len(ransomNote); i++ {
+        if _, ok := sMap[ransomNote[i]]; !ok {
+            return false
+        } else {
+            if sMap[ransomNote[i]] > 0 {
+                sMap[ransomNote[i]]-- 
+            } else {
+                return false
+            }
+        }
+    }
+    
+    return true
+}
+```
