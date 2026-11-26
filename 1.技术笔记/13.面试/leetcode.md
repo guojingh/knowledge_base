@@ -665,3 +665,50 @@ func canConstruct(ransomNote string, magazine string) bool {
     return true
 }
 ```
+
+### 15. 三数之和
+[题目链接](https://leetcode.cn/problems/3sum/description/ "题目链接")
+
+```go
+func threeSum(nums []int) [][]int {
+    
+    // 使用双指针法进行解决
+    result := make([][]int, 0)
+
+    var left, right int
+    // 对数组进行排序
+    sort.Ints(nums)
+    for i := 0; i < len(nums); i++ {
+        if nums[i] > 0 {
+            return result
+        }
+        if i > 0 && nums[i] == nums[i-1] {
+            continue
+        }
+
+        left = i+1  
+        right = len(nums)-1
+        for left < right {
+            if nums[i] + nums[left] + nums[right] > 0 {
+                right--
+            } else if nums[i] + nums[left] + nums[right] < 0 {
+                left++
+            } else {
+                // 关键点：找到三元组之后先将a,b,c去重
+                result = append(result, []int{nums[i], nums[left], nums[right]})
+                for left < right && nums[left] == nums[left+1] {
+                    left++
+                }
+                for left < right && nums[right] == nums[right-1] {
+                    right--
+                }
+                // 去重之后，还需要再次将left right 向后移动一位，因为现在left和right指向和三元组一样的值
+                left++
+                right--
+            }
+        } 
+    }
+
+    return result
+}
+```
