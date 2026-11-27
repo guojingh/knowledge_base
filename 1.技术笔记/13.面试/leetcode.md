@@ -712,3 +712,54 @@ func threeSum(nums []int) [][]int {
     return result
 }
 ```
+
+
+### 18. 四数之和
+[题目链接](https://leetcode.cn/problems/4sum/description/ "题目链接")
+
+```go
+func fourSum(nums []int, target int) [][]int {
+
+    // 使用双指针法，比起三数之和的区别就是多加了一层for循环
+    res := make([][]int, 0)
+    // 排序
+    sort.Ints(nums)
+
+    var left, right int
+    for k := 0; k < len(nums); k++ {
+        if nums[k] > target && (nums[k] >= 0 || target >= 0) {
+            return res
+        }
+        if k != 0 && nums[k] == nums[k-1] {
+            continue
+        }
+
+        for i := k+1; i < len(nums); i++ {
+            if i != k+1 && nums[i] == nums[i-1] {
+                continue
+            }
+            left = i+1
+            right = len(nums)-1
+            for left < right {
+                if nums[k]+nums[i]+nums[left]+nums[right] == target {
+                    res = append(res, []int{nums[k],nums[i],nums[left],nums[right]})
+                    for left < right && nums[left] == nums[left+1] {
+                        left++
+                    }
+                    for left < right && nums[right] == nums[right-1] {
+                        right--
+                    }
+                    left++
+                    right--
+                } else if nums[k]+nums[i]+nums[left]+nums[right] > target {
+                    right--
+                } else {
+                    left++
+                }
+            }
+        }
+    }
+
+    return res
+}
+```
